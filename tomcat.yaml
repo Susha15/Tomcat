@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  vars:
+    - http_port: 8080
+    - tomcat_version: 8.5.87
+
+  tasks:
+    - name: Install OpenJDK
+      apt: name=openjdk-8-jdk state=latest
+    - name: Create a Tomcat Directory
+      file:
+        path: /opt/tomcat8
+        owner: tomcat
+        group: tomcat
+        mode: 755
+        recurse: yes
+    - name: Download Tomcat
+      get_url:
+       url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.87/bin/apache-tomcat-8.5.87.tar.gz
+       dest: /opt/tomcat8
+    - name: Extract Tomcat
+      unarchive:
+       src: "/opt/tomcat8/apache-tomcat-8.5.87.tar.gz"
+       dest: /opt/tomcat8
+       remote_src: yes
+    - name: Change ownership of Tomcat installation
+      command: mv /opt/tomcat8/apache-tomcat-8.5.87 /opt/tomcat8/tomcat
+    - name: Starting tomcat
+      shell: nohup /opt/tomcat8/tomcat/bin/startup.sh
