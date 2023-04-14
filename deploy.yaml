@@ -1,21 +1,10 @@
 ---
 - hosts: localhost
-  vars:
-  - warName: sample.war
-  - warRemotePath: /path/to/put/war
-
-  tasks:
-  - name: Download WAR to server
-    synchronize: src={{ warLocalPath }}/{{ warName }} dest={{ warRemotePath }}/{{ warName }}
-
-  - name: Unzip WAR file
-    unarchive: src={{ warRemotePath }}/{{ warName }} dest=/var/lib/tomcat8/webapps/ROOT/ copy=no mode=0755 owner=tomcat group=tomcat
-    notify:
-        - Restart tomcat8
-
-  - name: Delete remote war file
-    file: path={{ warRemotePath }}/{{ warName }} state=absent
-
-  handlers:
-    - name: Restart tomcat8
-      service: name=tomcat state=restarted
+  become: true
+  tasks: null
+- name: Deploy war file
+  get_url: url=https://tomcat.apache.org/tomcat-8.5-doc/appdev/sample/sample.war
+    dest=/opt/apache-tomcat/sample.war
+- name: Deploy to tomcat folder
+  command: mv /opt/apache-tomcat/sample.war
+    /opt/apache-tomcat/apache-tomcat-8.5.87/webapps
